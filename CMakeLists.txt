@@ -21,6 +21,7 @@ endif()
 
 # Create the app module
 add_cfe_app(to_lab ${APP_SRC_FILES})
+include_directories(${APPLICATION_PLATFORM_INC_LIST})
 add_cfe_tables(to_lab fsw/tables/to_lab_sub.c)
 
 target_include_directories(to_lab PUBLIC fsw/inc)
