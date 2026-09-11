@@ -50,8 +50,9 @@ CFE_Status_t TO_LAB_CmdSubscribe(CFE_SB_MsgId_Atom_t MsgIdValue);
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 void TO_LAB_AppMain(void)
 {
-    uint32       RunStatus = CFE_ES_RunStatus_APP_RUN;
-    CFE_Status_t status;
+    uint32           RunStatus = CFE_ES_RunStatus_APP_RUN;
+    CFE_Status_t     status;
+    CFE_SB_Buffer_t *SBBufPtr;
 
     CFE_ES_PerfLogEntry(TO_LAB_MAIN_TASK_PERF_ID);
 
@@ -80,15 +81,18 @@ void TO_LAB_AppMain(void)
     {
         CFE_ES_PerfLogExit(TO_LAB_MAIN_TASK_PERF_ID);
 
-        /* NOTE: activity in this function is indicated by TO_LAB_SOCKET_SEND_PERF_ID,
-         * so it does not need to be included within TO_LAB_MAIN_TASK_PERF_ID. */
-        TO_LAB_forward_telemetry();
+        status = CFE_SB_ReceiveBuffer(&SBBufPtr, TO_LAB_Global.Cmd_pipe, CFE_SB_PEND_FOREVER);
 
         CFE_ES_PerfLogEntry(TO_LAB_MAIN_TASK_PERF_ID);
 
-        TO_LAB_process_commands();
-
-        TO_LAB_ManageTables();
+        if (status == CFE_SUCCESS)
+        {
+            TO_LAB_TaskPipe(SBBufPtr);
+        }
+        else
+        {
+            RunStatus = CFE_ES_RunStatus_APP_ERROR;
+        }
     }
 
     CFE_ES_ExitApp(RunStatus);
@@ -215,6 +219,11 @@ CFE_Status_t TO_LAB_init(void)
 
     if (status == CFE_SUCCESS)
     {
+        status = TO_LAB_CmdSubscribe(TO_LAB_WAKEUP_MID);
+    }
+
+    if (status == CFE_SUCCESS)
+    {
         /* Create TO TLM pipe */
         status = CFE_SB_CreatePipe(&TO_LAB_Global.Tlm_pipe, TO_LAB_PLATFORM_TLM_PIPE_DEPTH, "TO_LAB_TLM_PIPE");
         if (status != CFE_SUCCESS)
@@ -275,29 +284,6 @@ CFE_Status_t TO_LAB_CmdSubscribe(CFE_SB_MsgId_Atom_t MsgIdValue)
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 /*                                                                 */
-/* TO_LAB_process_commands() -- Process command pipe message       */
-/*                                                                 */
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-void TO_LAB_process_commands(void)
-{
-    CFE_SB_Buffer_t *SBBufPtr;
-    CFE_Status_t     Status;
-
-    /* Exit command processing loop if no message received. */
-    while (1)
-    {
-        Status = CFE_SB_ReceiveBuffer(&SBBufPtr, TO_LAB_Global.Cmd_pipe, CFE_SB_POLL);
-        if (Status != CFE_SUCCESS)
-        {
-            break;
-        }
-
-        TO_LAB_TaskPipe(SBBufPtr);
-    }
-}
-
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-/*                                                                 */
 /* TO_LAB_openTLM() -- Open TLM                                    */
 /*                                                                 */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
@@ -341,7 +327,7 @@ void TO_LAB_forward_telemetry(void)
 
     do
     {
-        CfeStatus = CFE_SB_ReceiveBuffer(&SBBufPtr, TO_LAB_Global.Tlm_pipe, TO_LAB_PLATFORM_TLM_PIPE_TIMEOUT);
+        CfeStatus = CFE_SB_ReceiveBuffer(&SBBufPtr, TO_LAB_Global.Tlm_pipe, CFE_SB_POLL);
 
         if ((CfeStatus == CFE_SUCCESS) && (TO_LAB_Global.suppress_sendto == false))
         {

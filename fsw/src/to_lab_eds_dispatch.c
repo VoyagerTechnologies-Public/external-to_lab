@@ -51,6 +51,10 @@ static const EdsDispatchTable_EdsComponent_TO_LAB_Application_CFE_SB_Telecommand
     .SEND_HK =
     {
         .indication = TO_LAB_SendHkCmd
+    },
+    .WAKEUP =
+    {
+        .indication = TO_LAB_WakeupCmd
     }
 };
 /* clang-format on */

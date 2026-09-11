@@ -69,6 +69,11 @@ typedef struct
 typedef struct
 {
     CFE_MSG_CommandHeader_t CommandHeader; /**< \brief Command header */
+} TO_LAB_WakeupCmd_t;
+
+typedef struct
+{
+    CFE_MSG_CommandHeader_t CommandHeader; /**< \brief Command header */
 } TO_LAB_NoopCmd_t;
 
 typedef struct

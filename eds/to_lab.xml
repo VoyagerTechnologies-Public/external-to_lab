@@ -107,6 +107,9 @@
       <ContainerDataType name="SendHkCmd" baseType="CFE_HDR/CommandHeader">
       </ContainerDataType>
 
+      <ContainerDataType name="WakeupCmd" baseType="CFE_HDR/CommandHeader">
+      </ContainerDataType>
+
       <ContainerDataType name="CMD" baseType="CFE_HDR/CommandHeader">
       </ContainerDataType>
 
@@ -194,6 +197,11 @@
               <GenericTypeMap name="TelecommandDataType" type="SendHkCmd" />
             </GenericTypeMapSet>
           </Interface>
+          <Interface name="WAKEUP" shortDescription="Scheduled telemetry forwarding wakeup" type="CFE_SB/Telecommand">
+            <GenericTypeMapSet>
+              <GenericTypeMap name="TelecommandDataType" type="WakeupCmd" />
+            </GenericTypeMapSet>
+          </Interface>
           <Interface name="HK_TLM" shortDescription="Software bus housekeeping telemetry interface" type="CFE_SB/Telemetry">
             <GenericTypeMapSet>
               <GenericTypeMap name="TelemetryDataType" type="HkTlm" />
@@ -210,6 +218,7 @@
           <VariableSet>
             <Variable type="BASE_TYPES/uint16" readOnly="true" name="CmdTopicId" initialValue="${CFE_MISSION/TO_LAB_CMD_TOPICID}" />
             <Variable type="BASE_TYPES/uint16" readOnly="true" name="SendHkTopicId" initialValue="${CFE_MISSION/TO_LAB_SEND_HK_TOPICID}" />
+            <Variable type="BASE_TYPES/uint16" readOnly="true" name="WakeupTopicId" initialValue="${CFE_MISSION/TO_LAB_WAKEUP_TOPICID}" />
             <Variable type="BASE_TYPES/uint16" readOnly="true" name="HkTlmTopicId" initialValue="${CFE_MISSION/TO_LAB_HK_TLM_TOPICID}" />
             <Variable type="BASE_TYPES/uint16" readOnly="true" name="DataTypesTopicId" initialValue="${CFE_MISSION/TO_LAB_DATA_TYPES_TOPICID}" />
           </VariableSet>
@@ -217,6 +226,7 @@
           <ParameterMapSet>
             <ParameterMap interface="CMD" parameter="TopicId" variableRef="CmdTopicId" />
             <ParameterMap interface="SEND_HK" parameter="TopicId" variableRef="SendHkTopicId" />
+            <ParameterMap interface="WAKEUP" parameter="TopicId" variableRef="WakeupTopicId" />
             <ParameterMap interface="HK_TLM" parameter="TopicId" variableRef="HkTlmTopicId" />
             <ParameterMap interface="DATA_TYPES" parameter="TopicId" variableRef="DataTypesTopicId" />
           </ParameterMapSet>

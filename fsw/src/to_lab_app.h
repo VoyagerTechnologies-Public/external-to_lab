@@ -93,7 +93,6 @@ typedef struct
 void         TO_LAB_AppMain(void);
 void         TO_LAB_openTLM(void);
 int32        TO_LAB_init(void);
-void         TO_LAB_process_commands(void);
 void         TO_LAB_forward_telemetry(void);
 CFE_Status_t TO_LAB_ValidateSubTable(void *TblPtr);
 uint16       TO_LAB_UnsubscribeFromTlmPipe(void);
