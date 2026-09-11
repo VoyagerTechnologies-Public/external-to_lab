@@ -31,6 +31,16 @@
 #include "to_lab_msgids.h"
 #include "to_lab_version.h"
 
+CFE_Status_t TO_LAB_WakeupCmd(const TO_LAB_WakeupCmd_t *data)
+{
+    (void)data;
+
+    TO_LAB_forward_telemetry();
+    TO_LAB_ManageTables();
+
+    return CFE_SUCCESS;
+}
+
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 /*                                                                 */
 /* TO_LAB_EnableOutput() -- TLM output enabled                     */

@@ -86,6 +86,7 @@ void TO_LAB_TaskPipe(const CFE_SB_Buffer_t *SBBufPtr)
 {
     static CFE_SB_MsgId_t CMD_MID     = CFE_SB_MSGID_RESERVED;
     static CFE_SB_MsgId_t SEND_HK_MID = CFE_SB_MSGID_RESERVED;
+    static CFE_SB_MsgId_t WAKEUP_MID  = CFE_SB_MSGID_RESERVED;
 
     CFE_SB_MsgId_t MsgId = CFE_SB_INVALID_MSG_ID;
 
@@ -94,6 +95,7 @@ void TO_LAB_TaskPipe(const CFE_SB_Buffer_t *SBBufPtr)
     {
         CMD_MID     = CFE_SB_ValueToMsgId(TO_LAB_CMD_MID);
         SEND_HK_MID = CFE_SB_ValueToMsgId(TO_LAB_SEND_HK_MID);
+        WAKEUP_MID  = CFE_SB_ValueToMsgId(TO_LAB_WAKEUP_MID);
     }
 
     CFE_MSG_GetMsgId(&SBBufPtr->Msg, &MsgId);
@@ -103,6 +105,10 @@ void TO_LAB_TaskPipe(const CFE_SB_Buffer_t *SBBufPtr)
     {
         /* Housekeeping request */
         TO_LAB_SendHkCmd((const TO_LAB_SendHkCmd_t *)SBBufPtr);
+    }
+    else if (CFE_SB_MsgId_Equal(MsgId, WAKEUP_MID))
+    {
+        TO_LAB_WakeupCmd((const TO_LAB_WakeupCmd_t *)SBBufPtr);
     }
     else if (CFE_SB_MsgId_Equal(MsgId, CMD_MID))
     {
